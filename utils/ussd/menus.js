@@ -1,36 +1,61 @@
-// menuGenerator.js
+import { setUserContext } from "./app.js";
+import {
+  WELCOME_MESSAGE,
+  MAIN_MENU,
+  GROUP_MENU,
+  NO_GROUPS_MESSAGE,
+  GROUP_MEMBER_MENU,
+  GROUP_ADMIN_MENU,
+  ABOUT_MESSAGE,
+} from "./responses.js";
 
-import { WELCOME_MESSAGE, MAIN_MENU, REGISTER_PROMPT } from "./responses";
+// Menu generator for welcome menu
+export function generateWelcomeMenu(registered, user, userId) {
+  let prompt = "CON " + WELCOME_MESSAGE + ",\n";
 
-export function generateMenuPrompt(registered, userGroups, selectedGroup) {
-  let prompt = "";
   if (!registered) {
-    // If user is not registered, show option to create account
     prompt += `${MAIN_MENU.CREATE_ACCOUNT}\n`;
+    setUserContext("create_account");
   } else {
-    // If user is registered, show permanent options
+    if (user) {
+      prompt += `${user.fullName}\n`;
+      if (user.groups.length === 0) {
+        prompt += NO_GROUPS_MESSAGE + "\n";
+      } else {
+        prompt += "1. You have a group\n";
+        prompt += user.groups[0] + "\n";
+      }
+    } else {
+      prompt += "Welcome!\n";
+    }
     prompt += `${MAIN_MENU.CREATE_GROUP}\n`;
     prompt += `${MAIN_MENU.EXIT}\n`;
+    // setUserContext("group");
   }
-
-  if (userGroups.length === 0) {
-    prompt += REGISTER_PROMPT;
-  } else {
-    // If user is in groups, generate menu for each group
-    userGroups.forEach((group, index) => {
-      prompt += `${index + 1}. View Group: ${group.name}\n`;
-    });
-
-    // Add options for selected group
-    if (selectedGroup) {
-      prompt += `\nGroup: ${selectedGroup.name}\n`;
-      prompt += `1. View Remaining Balance\n`;
-      prompt += `2. View Contribution Amount\n`;
-      prompt += `3. Contribute\n`;
-      prompt += `4. View Next Cashout Date\n`;
-      prompt += `5. View Contribution Day\n`;
-    }
-  }
-
   return prompt;
+}
+
+export function generateGroupMenu(groupId, userId) {
+  let selectedGroup = {
+    name: "Test Group",
+    id: groupId,
+    member: userId,
+  };
+
+  //TODO: get group info from database and userid member info
+  let prompt = "";
+  prompt += `\nGroup: ${selectedGroup.name}\n`;
+
+  GROUP_OPTIONS_MENU.forEach((option) => {
+    prompt += option + "\n";
+  });
+
+  setUserContext("group");
+  return prompt;
+}
+
+// Menu generator for about menu
+export function generateAboutMenu() {
+  setUserContext("about");
+  return ABOUT_MESSAGE + "\n" + GROUP_MENU.EXIT;
 }

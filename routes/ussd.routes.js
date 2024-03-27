@@ -1,14 +1,8 @@
-// ussd.routes.js
 import express from "express";
-import { handleUserInput, setPhoneNumber } from "./ussdApp";
+import { ussdRequest } from "../controllers/ussd.controller.js";
 
 const router = express.Router();
 
-router.post("/ussd", (req, res) => {
-  const { phoneNumber, text } = req.body;
-  setPhoneNumber(phoneNumber); 
-  const response = handleUserInput(text);
-  res.send(response);
-});
+router.post("/", ussdRequest);
 
 export default router;
