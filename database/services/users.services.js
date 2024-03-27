@@ -1,11 +1,17 @@
 import { db } from "../firebase.js";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  getDoc,
+  addDoc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 
 const usersCollectionRef = collection(db, "users");
 
 export async function isUserRegistered(phoneNumber) {
   try {
-
     if (!phoneNumber) {
       throw new Error("Phone number is required");
     }
@@ -21,7 +27,6 @@ export async function isUserRegistered(phoneNumber) {
       return { registered: false, userData: null };
     }
     const userData = userSnapshot.docs[0].data();
-    console.log("User data:", userData);
     const userId = userSnapshot.docs[0].id;
 
     return { registered: true, userId, userData };
@@ -31,16 +36,11 @@ export async function isUserRegistered(phoneNumber) {
   }
 }
 
-export async function registerUser(phoneNumber, fullname, idNumber) {
+export async function registerUser(user) {
   try {
     // Add a new document to the users collection
-    const newUserRef = await addDoc(usersCollectionRef, {
-      phoneNumber,
-      fullname,
-      idNumber,
-      groups: [],
-    });
-    return newUserRef.id; // Return the ID of the newly added document
+    const newUserRef = await addDoc(usersCollectionRef, user);
+    return newUserRef.id;
   } catch (error) {
     console.error("Error registering user:", error);
     throw error;

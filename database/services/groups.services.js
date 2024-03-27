@@ -1,33 +1,65 @@
 import { db } from "../firebase.js";
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  arrayUnion,
+  doc,
+  query,
+  where,
+  getDocs,
+  setDoc,
+} from "firebase/firestore";
 
-export async function getUserGroups(userGroupsIds) {
+const groupsCollectionRef = collection(db, "groups");
+const usersCollectionRef = collection(db, "users");
+
+// Function to create a new group
+export async function createGroup(group, creatorId) {
   try {
-    // Check if userGroupsIds is an array before mapping over it
-    if (!Array.isArray(userGroupsIds) || userGroupsIds.length === 0) {
-      return []; // Return an empty array if userGroupsIds is not an array or is empty
-    }
+    const docRef = await addDoc(groupsCollectionRef, group);
 
-    // Array to store promises to fetch group names
-    const groupPromises = userGroupsIds.map(async (groupId) => {
-      const groupDocRef = db.collection("groups").doc(groupId);
-      const groupDocSnapshot = await groupDocRef.get();
-      if (groupDocSnapshot.exists) {
-        const groupName = groupDocSnapshot.data().name;
-        return { id: groupId, name: groupName }; // Return an object with group ID and name
-      } else {
-        return null;
+    // Add the creatorId as the id in members of the group and give role of admin
+    await setDoc(
+      doc(collection(db, `groups/${docRef.id}/members`), creatorId),
+      {
+        userId: creatorId,
+        role: "admin",
       }
+    );
+
+    // Add the group to the creator's groups array
+    const userDocRef = doc(usersCollectionRef, creatorId); // Corrected line
+    await updateDoc(userDocRef, {
+      groups: arrayUnion(docRef.id),
     });
 
-    // Wait for all promises to resolve
-    const groupData = await Promise.all(groupPromises);
+    return docRef.id;
+  } catch (e) {
+    console.error("Error adding document: ", e);
+    throw e; // Rethrow the error to handle it in the caller function
+  }
+}
 
-    // Filter out any null values (for groups that couldn't be found)
-    const userGroups = groupData.filter((group) => group !== null);
+// Function to get a groups by id and return name and id  and return objects inside array
+// Function to get groups by their IDs
+export async function getGroupsByIds(groupIds) {
+  try {
+    const groupsQuery = query(
+      groupsCollectionRef,
+      where("__name__", "in", groupIds)
+    );
+    const groupsSnapshot = await getDocs(groupsQuery);
 
-    return userGroups;
+    const groupsData = [];
+    groupsSnapshot.forEach((doc) => {
+      const groupData = doc.data();
+      groupsData.push({ id: doc.id, name: groupData.name });
+    });
+
+    return groupsData;
   } catch (error) {
-    console.error("Error fetching user's groups:", error);
+    console.error("Error fetching groups:", error);
     throw error;
   }
 }
