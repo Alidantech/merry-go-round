@@ -1,6 +1,9 @@
-// Define the ussd responses
-export const WELCOME_MESSAGE = "Welcome to My USSD App. Choose an option:";
-export const MAIN_MENU =
-  "Main Menu:\n1. Register\n2. Login\n3. Group Management\n4. Exit";
-export const REGISTER_PROMPT =
-  "Please enter your details (e.g., Name, Age, etc.):";
+// responses.js
+
+export const WELCOME_MESSAGE = "Welcome to My USSD App!";
+export const MAIN_MENU = {
+  CREATE_ACCOUNT: "1. Create Account",
+  CREATE_GROUP: "98. Create Group",
+  EXIT: "0. Exit",
+};
+export const REGISTER_PROMPT = "You are not in any groups yet.";

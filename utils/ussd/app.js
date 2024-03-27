@@ -1,40 +1,16 @@
-// ussdApp.js
-import {
-  generateWelcomeMenu,
-  generateIdNumberMenu,
-  generateFullNameMenu,
-} from "./menuUtils";
-import { registerUser } from "./services/registrationService";
+import { getUserGroups, getGroupInfo } from "./services/groupService";
+import { isUserRegistered } from "./services/registrationService";
+import { generateMenuPrompt } from "./menuGenerator";
 
-let userContext = "welcome";
-let phoneNumber = ""; 
-let idNumber = ""; 
-
-export function handleUserInput(input) {
+export async function handleUserInput(input, userContext, phoneNumber) {
   switch (userContext) {
     case "welcome":
-      userContext = "idNumber";
-      return generateIdNumberMenu();
-    case "idNumber":
-      // Store ID number
-      idNumber = input;
-      userContext = "fullName";
-      return generateFullNameMenu();
-    case "fullName":
-      // Register user with stored phone number, full name, and ID number
-      registerUser(phoneNumber, input, idNumber); 
-      userContext = "registered";
-      return "Account created successfully!";
-    case "registered":
-      // Handle other contexts or actions after registration
-      break;
-    default:
-      return "Invalid input. Please try again.";
+      const userGroups = await getUserGroups(phoneNumber);
+      const registered = await isUserRegistered(phoneNumber);
+      return generateMenuPrompt(registered, userGroups);
+    case "group":
+      const selectedGroup = await getGroupInfo(input); // Get info for selected group
+      return generateMenuPrompt(true, [], selectedGroup);
+    // Handle other cases
   }
-}
-
-
-// Function to set phone number from USSD request
-export function setPhoneNumber(number) {
-  phoneNumber = number; 
 }
