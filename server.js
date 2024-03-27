@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import cron from "node-cron";
+import { sendAlertViaSMS } from "./messages/sms.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
