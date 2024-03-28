@@ -1,11 +1,14 @@
-import { setUserContext } from "../app.js";
+import  UserInputHandler  from "../app.js";
 import { ABOUT_MESSAGE, GROUP_MENU } from "../responses.js";
+
 
 // variable for index
 let _index = null;
 let _text = null;
 // Menu generator for about menu
 export default function generateAboutMenu(text, index) {
+  const userInputHandler = new UserInputHandler();
+
   setIndex(index);
   setText(text);
   // setUserContext("about", _text.length);

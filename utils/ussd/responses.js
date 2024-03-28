@@ -16,13 +16,7 @@ export const MAIN_MENU = {
 
 export const NO_GROUPS_MESSAGE = "You are not in any groups yet.";
 
-export const GROUP_MEMBER_MENU = [
-  "1. View Remaining Balance",
-  "2. View Contribution Amount",
-  "3. Contribute",
-  "4. View Next Cashout Date",
-  "5. View Contribution Day",
-];
+
 
 // GROUP CREATION PROMPTS
 export const GROUP_CREATION_PROMPTS = {
@@ -44,16 +38,12 @@ export const ACCOUNT_CREATION_PROMPTS = {
   SUCCESS: "Account created successfully.",
 };
 
-export const GROUP_ADMIN_MENU = [
-  "1. View Remaining Balance",
-  "2. View Contribution Amount",
-  "3. Contribute",
-  "4. View Next Cashout Date",
-  "5. View Contribution Day",
-  "6. Add Member",
-  "7. Remove Member",
-  "8. View Members",
-];
+// show groups options as variables
+export const GROUP_OPTIONS = {
+  VIEW: "1. View Groups",
+  JOIN: "2. Join Group",
+  BACK: "0. Back",
+};
 
 export const GROUP_MENU = {
   ABOUT: "99. About",
@@ -81,10 +71,30 @@ function getGreeting() {
   return `Good ${greeting},`;
 }
 
-export const USER_ACCOUNT_VIEW = [
-  "1. Phone Number",
-  "2. ID Number",
-  "3. Full Name",
-  "4. Date of Birth",
-  "5. Edit Account",
-];
+export const USER_ACCOUNT_VIEW = {
+  SHOW_PHONE: "1. Phone Number",
+  SHOW_ID: "2. ID Number",
+  SHOW_FULL_NAME: "3. Full Name",
+  SHOW_DOB: "4. Date of Birth",
+  EDIT_ACCOUNT: "5. Edit Account"
+};
+
+export const GROUP_MEMBER_MENU = {
+  VIEW_REMAINING_BALANCE: "1. View Remaining Balance",
+  VIEW_CONTRIBUTION_AMOUNT: "2. View Contribution Amount",
+  CONTRIBUTE: "3. Contribute",
+  VIEW_NEXT_CASHOUT_DATE: "4. View Next Cashout Date",
+  VIEW_CONTRIBUTION_DAY: "5. View Contribution Day"
+};
+
+export const GROUP_ADMIN_MENU = {
+  VIEW_REMAINING_BALANCE: "1. View Remaining Balance",
+  VIEW_CONTRIBUTION_AMOUNT: "2. View Contribution Amount",
+  CONTRIBUTE: "3. Contribute",
+  VIEW_NEXT_CASHOUT_DATE: "4. View Next Cashout Date",
+  VIEW_CONTRIBUTION_DAY: "5. View Contribution Day",
+  VIEW_GROUP_MEMBERS: "6. View Group Members"
+};
+
+
+export const FUTURE_IMPLEMENTATION_MESSAGE = "Feature coming soon.";

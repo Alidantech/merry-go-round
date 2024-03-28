@@ -9,6 +9,7 @@ import {
   where,
   getDocs,
   setDoc,
+  getDoc,
 } from "firebase/firestore";
 
 const groupsCollectionRef = collection(db, "groups");
@@ -27,9 +28,7 @@ export async function createGroup(group, creatorId) {
         role: "admin",
       }
     );
-
-    // Add the group to the creator's groups array
-    const userDocRef = doc(usersCollectionRef, creatorId); // Corrected line
+    const userDocRef = doc(usersCollectionRef, creatorId); 
     await updateDoc(userDocRef, {
       groups: arrayUnion(docRef.id),
     });
@@ -43,7 +42,7 @@ export async function createGroup(group, creatorId) {
 
 // Function to get a groups by id and return name and id  and return objects inside array
 // Function to get groups by their IDs
-export async function getGroupsByIds(groupIds) {
+export async function getGroupsByIds(groupIds, userId) {
   try {
     const groupsQuery = query(
       groupsCollectionRef,
@@ -51,15 +50,64 @@ export async function getGroupsByIds(groupIds) {
     );
     const groupsSnapshot = await getDocs(groupsQuery);
 
-    const groupsData = [];
-    groupsSnapshot.forEach((doc) => {
+    const promises = groupsSnapshot.docs.map(async (doc) => {
       const groupData = doc.data();
-      groupsData.push({ id: doc.id, name: groupData.name });
+      const userMembership = await getUserGroupMemberInfo(userId, doc.id);
+      return {
+        id: doc.id,
+        name: groupData.name,
+        data: groupData,
+        userMembership: userMembership,
+      };
     });
 
-    return groupsData;
+    // Wait for all promises to resolve
+    const resolvedData = await Promise.all(promises);
+    return resolvedData;
   } catch (error) {
     console.error("Error fetching groups:", error);
+    throw error;
+  }
+}
+
+// Function to get info about a member of a group
+export async function getUserGroupMemberInfo(userId, groupId) {
+  try {
+    const docSnapshot = await getDoc(
+      doc(db, `groups/${groupId}/members/${userId}`)
+    );
+
+    if (docSnapshot.exists()) {
+      return docSnapshot.data();
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching group data:", error);
+    throw error;
+  }
+}
+
+export async function addMemberToGroup(userId, groupId, role) {
+  try {
+    // Define the data for the member
+    const memberData = {
+      userId: userId,
+      role: role,
+    };
+
+    // Add the member document to the group's "members" subcollection
+    await setDoc(
+      groupsCollectionRef.doc(groupId).collection("members").doc(userId),
+      memberData
+    );
+
+    console.log("Member added successfully.");
+
+    // Optionally, you can return a success message or other data if needed
+    return "Member added successfully.";
+  } catch (error) {
+    console.error("Error adding member to group:", error);
     throw error;
   }
 }
