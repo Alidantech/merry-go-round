@@ -76,6 +76,8 @@ export async function addUserToGroup(userId, groupId) {
   }
 }
 
+
+
 export async function removeUserFromGroup(userId, groupId) {
   try {
     // Update the user document to remove the group from the groups array

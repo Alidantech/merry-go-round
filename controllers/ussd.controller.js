@@ -1,8 +1,12 @@
-import { handleUserInput, setPhoneNumber } from "../utils/ussd/app.js";
+import UserInputHandler from "../utils/ussd/app.js";
+
+const userInputHandler = new UserInputHandler();
 
 export const ussdRequest = async (req, res) => {
   const { phoneNumber, text } = req.body;
-  setPhoneNumber(phoneNumber);
-  const response = await handleUserInput(text);
+  userInputHandler.setPhoneNumber(phoneNumber);
+  const response = await userInputHandler.handleInput(text);
   res.send(response);
 };
+
+export default userInputHandler;

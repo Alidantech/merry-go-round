@@ -1,4 +1,4 @@
-import { setUserContext } from "../app.js";
+import e from "cors";
 import {
   WELCOME_MESSAGE,
   MAIN_MENU,
@@ -8,57 +8,32 @@ import {
   INVALID_REQUEST_MESSAGE,
   THANK_YOU_MESSAGE,
   ERROR_MESSAGE,
+  GROUP_MEMBER_MENU,
+  GROUP_ADMIN_MENU,
   GROUP_CREATION_PROMPTS,
   ACCOUNT_CREATION_PROMPTS,
 } from "../responses.js";
-import generateAccountViewMenu from "./account_info.js";
-
-// variable for index
-let _index = null;
-let _text = null;
-
-// Menu generator for welcome menu
-function generateWelcomeMenu(
-  registered,
-  user,
-  userId,
-  text,
-  index,
-  userGroups
-) {
-  let prompt = "";
-  setIndex(index);
-  setText(text);
-  if (!registered) {
-    prompt += showRegistrationOptions();
-  } else if (user) {
-    prompt += showRegisteredUserOptions(userId, user, userGroups);
-  } else {
-    prompt = `END ${INVALID_REQUEST_MESSAGE}`;
-  }
-  return prompt;
-}
 
 // Menu generator for registration menu
-function showRegistrationOptions() {
-  if (_text === "") {
+export function showRegistrationOptions(text) {
+  if (text === "") {
     return `CON ${WELCOME_MESSAGE}\n${MAIN_MENU.CREATE_ACCOUNT}\n${MAIN_MENU.ABOUT}`;
-  } else if (_text === "1") {
-    setUserContext("create_account", _text.length);
-    return `CON ${ACCOUNT_CREATION_PROMPTS.FULL_NAME}`;
-  } else if (_text === "99") {
-    // setUserContext("about", _text.length);
+  } else if (text === "1") {
+    return;
+  } else if (text === "99") {
     return `END ${ABOUT_MESSAGE}`;
   } else {
+    console.log("INVALID REQUEST REGISTER REQ:", text);
     return `END ${INVALID_REQUEST_MESSAGE}`;
   }
 }
 
 // Menu generator for group menu
-function showRegisteredUserOptions(userId, user, userGroups) {
+export function showRegisteredUserOptions(userId, user, userGroups, text) {
+  console.log("text", text);
   try {
     const commonOptions = `${MAIN_MENU.MY_ACCOUNT}\n${MAIN_MENU.CREATE_GROUP}\n${MAIN_MENU.ABOUT}\n${MAIN_MENU.EXIT}`;
-    if (_text === "") {
+    if (text === "") {
       const greeting = `${GREET_USER} ${user.fullName}`;
       if (user.groups.length === 0) {
         return `CON ${greeting}\n${NO_GROUPS_MESSAGE}\n${commonOptions}`;
@@ -73,39 +48,37 @@ function showRegisteredUserOptions(userId, user, userGroups) {
 
         return (response += `${commonOptions}`);
       }
-    } else if (_text === "97") {
-      setUserContext("account_info", _text.length);
-      return generateAccountViewMenu(user, _text, 0);
-    } else if (_text === "00") {
-      setUserContext("welcome", 0);
+    } else if (text === "97") {
+      return `END Full Name: ${user.fullName}\nID Number: ${user.idNumber}\nPhone Number: ${user.phoneNumber}\nDate of Birth: ${user.dob}`;
+    } else if (text === "00") {
       return `END ${THANK_YOU_MESSAGE}`;
-    } else if (_text === "98") {
-      setUserContext("create_group", _text.length);
-      return `CON ${GROUP_CREATION_PROMPTS.NAME}`;
-    } else if (_text === "99") {
-      // setUserContext("about", _text.length);
-      setUserContext("welcome", 0);
+    } else if (text === "98") {
+      console.log("Create group prompt:", GROUP_CREATION_PROMPTS.NAME);
+      return "create";
+    } else if (text === "99") {
       return `END ${ABOUT_MESSAGE}`;
+    } else if(text === "8") {
+      console.log("Create group prompt:", GROUP_CREATION_PROMPTS.NAME);
+      return "create";
+    }
+    else {
+      console.log("INVALID REQUEST:", text);
+      return `END ${INVALID_REQUEST_MESSAGE}`;
     }
   } catch (error) {
     console.error("Error showing user options:", error);
-    // Handle error gracefully
     return `END ${ERROR_MESSAGE}`;
   }
 }
 
-// set the index to start from
-export function setIndex(index) {
-  _index = index;
-}
-
-// Set the text to start from the index
-export function setText(text) {
-  if (_index >= text.length || text.length === 0) {
-    _text = "";
+// show the group member options when user selects group:
+export function showGroupMemberOptions() {
+  if (text === "") {
+    return `CON ${GROUP_MEMBER_MENU.VIEW}\n${GROUP_MEMBER_MENU.JOIN}\n${GROUP_MEMBER_MENU.BACK}`;
+  } else if (_text === "0") {
+    setUserContext("welcome", 0);
+    return `END ${THANK_YOU_MESSAGE}`;
   } else {
-    _text = text.slice(_index);
+    return `END ${INVALID_REQUEST_MESSAGE}`;
   }
 }
-
-export default generateWelcomeMenu;
